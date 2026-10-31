@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Лаборатория Архимеда — 7 класс</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #fafbfc 0%, #f0f4f8 100%);
+    color: #1f2937;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: #fff;
+    padding: 24px 20px;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  }
+  header h1 { margin: 0 0 6px; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  header p { margin: 0; font-size: 15px; opacity: 0.95; font-weight: 500; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 20px; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: center; margin-bottom: 20px;
+  }
+  .toolbar label { font-size: 14px; font-weight: 600; color: #4b5563; }
+  select {
+    font: inherit; font-size: 15px; padding: 10px 14px; min-height: 48px;
+    border: 2px solid #d1d5db; border-radius: 10px; background: #fff; color: #1f2937;
+    cursor: pointer; transition: all 0.2s;
+  }
+  select:hover { border-color: #2563eb; }
+  select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+  .counter {
+    margin-left: auto; font-size: 14px; font-weight: 600;
+    background: #fff; padding: 12px 16px; border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); color: #4b5563;
+  }
+  button {
+    font: inherit; font-weight: 600; cursor: pointer; min-height: 48px;
+    border: 2px solid transparent; background: #fff; color: #1f2937;
+    border-radius: 12px; padding: 12px 18px;
+    transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  button:active:not(:disabled) { transform: translateY(0); }
+  button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+  .secondary { background: #f3f4f6; border-color: #e5e7eb; }
+  .secondary:hover:not(:disabled) { background: #e5e7eb; }
+  .layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
+  .panel {
+    background: #fff; border-radius: 16px; padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  h2 { font-size: 20px; margin: 0 0 16px; font-weight: 700; color: #111827; }
+  h3 { font-size: 15px; margin: 20px 0 10px; font-weight: 600; color: #374151; }
+  .stage {
+    background: linear-gradient(180deg, #f8fafc 0%, #e0e7ff 100%);
+    border-radius: 12px; overflow: hidden; border: 2px solid #e5e7eb;
+  }
+  canvas { display: block; width: 100%; aspect-ratio: 600 / 420; }
+  .note { font-size: 13px; color: #6b7280; margin: 10px 0 14px; }
+  .densline {
+    font-size: 14px; font-weight: 600; background: #eff6ff;
+    padding: 12px 14px; border-radius: 10px; margin-bottom: 14px;
+    border-left: 4px solid #2563eb; color: #1e40af;
+  }
+  .forces { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .force {
+    background: #f9fafb; border-radius: 12px; padding: 14px; text-align: center;
+    border: 2px solid #e5e7eb;
+  }
+  .force b { display: block; font-size: 22px; margin-top: 6px; font-weight: 700; }
+  .force small { font-size: 12px; color: #6b7280; font-weight: 500; }
+  .force.gravity b { color: #dc2626; }
+  .force.buoy b { color: #2563eb; }
+  .options { display: flex; flex-wrap: wrap; gap: 10px; }
+  .options button {
+    flex: 1 1 auto; min-width: 100px; font-size: 15px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .options button .emoji { font-size: 20px; }
+  input[type=range] { width: 100%; height: 44px; accent-color: #2563eb; }
+  .rangehead { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; font-weight: 600; }
+  .rangehead b { color: #2563eb; font-size: 18px; }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .predict {
+    background: #fef3c7; border: 2px solid #fbbf24;
+    border-radius: 12px; padding: 16px; margin-top: 20px;
+  }
+  .predict .options button { background: #fff; }
+  .predict .options button.active { background: #f59e0b; border-color: #f59e0b; }
+  .runrow { display: flex; gap: 10px; margin-top: 18px; }
+  .runrow button:first-child {
+    flex: 1; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: #fff; border-color: #2563eb; font-weight: 700; font-size: 17px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+  .runrow button:first-child:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  }
+  .unavailable { opacity: 0.6; }
+  .feedback {
+    margin-top: 16px; padding: 16px; border-radius: 12px;
+    background: #f9fafb; font-size: 15px; min-height: 70px;
+    border: 2px solid #e5e7eb;
+  }
+  .feedback.good {
+    background: #d1fae5; border-color: #10b981; color: #065f46;
+  }
+  .feedback.good::before { content: "✅ "; font-size: 18px; }
+  .feedback.bad {
+    background: #fee2e2; border-color: #ef4444; color: #991b1b;
+  }
+  .feedback.bad::before { content: "❌ "; font-size: 18px; }
+  .feedback.info {
+    background: #fef3c7; border-color: #f59e0b; color: #92400e;
+  }
+  .feedback.info::before { content: "ℹ️ "; font-size: 18px; }
+  .toast { font-weight: 700; }
+  #taskPanel { margin-top: 20px; }
+  #taskPanel p { margin: 10px 0; font-size: 15px; }
+  .progress-bar {
+    background: #e5e7eb; border-radius: 10px; height: 8px;
+    margin: 16px 0; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    transition: width 0.3s ease;
+  }
+  .task-image-container {
+    margin: 16px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f3f4f6;
+    border: 2px solid #e5e7eb;
+  }
+  .task-image-container.hidden { display: none; }
+  .task-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 240px;
+    object-fit: cover;
+  }
+  .steps { padding-left: 24px; margin: 12px 0; font-size: 14px; }
+  .steps li { margin: 6px 0; padding: 4px 0; }
+  .steps .done { color: #059669; font-weight: 600; }
+  .hintbox {
+    background: #fef3c7; border: 2px solid #fbbf24;
+    border-radius: 12px; padding: 14px; margin-top: 14px; font-size: 15px;
+  }
+  .hidden { display: none !important; }
+  .taskactions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(17, 24, 39, 0.7);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; z-index: 50; backdrop-filter: blur(4px);
+  }
+  .modal {
+    background: #fff; border-radius: 16px; padding: 28px;
+    max-width: 640px; width: 100%; max-height: 90vh; overflow: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 16px 0; }
+  th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+  th { background: #f9fafb; font-weight: 600; }
+  .bonus {
+    font-size: 14px; background: #eff6ff; padding: 14px;
+    border-radius: 12px; margin-top: 16px; border-left: 4px solid #2563eb;
+  }
+  footer {
+    padding: 16px 20px 32px; text-align: center;
+    color: #6b7280; font-size: 13px;
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .counter { margin-left: 0; width: 100%; text-align: center; }
+    header h1 { font-size: 24px; }
+    .panel { padding: 18px; }
+    .forces { grid-template-columns: 1fr; }
+    .options button { min-width: 80px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🔬 Лаборатория Архимеда</h1>
+  <p>7 класс · Архимедова сила. Плавание тел</p>
+</header>
+
+<div class="wrap">
+
+  <div class="toolbar">
+    <label for="modeSelect">Режим:</label>
+    <select id="modeSelect">
+      <option value="free">🧪 Свободный эксперимент</option>
+      <option value="tasks">📋 Задания</option>
+    </select>
+    <button id="tableBtn" class="secondary">📊 Таблица плотностей</button>
+    <button id="soundBtn" class="secondary" title="Включить или выключить звуки">🔊 Звук</button>
+    <div class="counter" id="counter">Опытов: 0 · Верных прогнозов: 0</div>
+  </div>
+
+  <section class="panel hidden" id="taskPanel">
+    <h2 id="taskTitle"></h2>
+    <div class="task-image-container hidden" id="taskImageContainer">
+      <img class="task-image" id="taskImage" alt="" src="">
+    </div>
+    <p id="taskLegend"></p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <ul class="steps" id="taskSteps"></ul>
+    <div id="conclusionBox" class="hidden">
+      <h3>Какой вывод ты сделал?</h3>
+      <div class="options">
+        <button data-conclusion="density">✓ Важна плотность, а не объём</button>
+        <button data-conclusion="volume">✗ Маленькое тело обязательно всплывёт</button>
+      </div>
+    </div>
+    <div class="taskactions">
+      <button id="checkTaskBtn" class="secondary">Проверить задание</button>
+      <button id="nextTaskBtn" class="hidden">Следующее задание →</button>
+      <button id="hintTaskBtn" class="secondary hidden">💡 Подсказка</button>
+      <button id="restartTasksBtn" class="secondary">🔄 Начать заново</button>
+    </div>
+    <div id="taskFeedback" class="feedback hidden"></div>
+    <div id="hintBox" class="hintbox hidden">
+      💡 Посмотри на соотношение плотностей. Меняется ли оно при движении ползунка?
+    </div>
+  </section>
+
+  <div class="layout">
+    <section class="panel">
+      <h2>🧪 Аквариум</h2>
+      <div class="stage"><canvas id="scene" width="600" height="420" aria-label="Сосуд с жидкостью и телом"></canvas></div>
+      <p class="note">Стрелки показывают направление и примерное соотношение сил. Точные значения — ниже.</p>
+      <div class="densline" id="densLine"></div>
+      <div class="forces">
+        <div class="force gravity"><small>Сила тяжести Fт</small><b id="fGravity">—</b></div>
+        <div class="force buoy"><small>Архимедова сила Fарх</small><b id="fBuoy">—</b></div>
+        <div class="force"><small>Погружено</small><b id="submerged">0%</b></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>🎛️ Панель управления</h2>
+      <fieldset id="controls">
+        <h3>1. Материал тела</h3>
+        <div class="options" id="materialOptions"></div>
+
+        <h3>2. Объём тела</h3>
+        <div class="rangehead"><span>100 см³</span><b id="volumeValue">500 см³</b><span>1000 см³</span></div>
+        <input type="range" id="volume" min="100" max="1000" step="50" value="500">
+
+        <h3>3. Жидкость</h3>
+        <div class="options" id="liquidOptions"></div>
+
+        <div class="predict">
+          <h3 style="margin-top:0">4. Твой прогноз</h3>
+          <div class="options" id="predictOptions">
+            <button data-predict="sink">⬇️ Утонет</button>
+            <button data-predict="float">⬆️ Всплывёт</button>
+            <button data-predict="neutral">⏸️ Будет плавать внутри</button>
+          </div>
+        </div>
+
+        <div class="runrow">
+          <button id="runBtn" class="unavailable">🚀 Опустить тело</button>
+          <button id="resetBtn" class="secondary">🔄 Сброс</button>
+        </div>
+      </fieldset>
+      <div class="feedback" id="feedback" role="status" aria-live="polite">
+        Настрой опыт и сделай прогноз. Без прогноза запустить опыт нельзя.
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="overlay hidden" id="tableOverlay" role="dialog" aria-modal="true" aria-label="Таблица плотностей">
+  <div class="modal">
+    <h2>📊 Таблица плотностей</h2>
+    <p class="note">Значения в кг/м³, как в школьных таблицах. Расчёт в симуляторе при g = 10 м/с².</p>
+    <table>
+      <thead><tr><th>Тело</th><th>ρ, кг/м³</th></tr></thead>
+      <tbody>
+        <tr><td>🪵 Пробка</td><td>240</td></tr>
+        <tr><td>🌲 Сосна</td><td>400</td></tr>
+        <tr><td>🧊 Лёд</td><td>900</td></tr>
+        <tr><td>🔩 Алюминий</td><td>2700</td></tr>
+        <tr><td>⚙️ Железо</td><td>7800</td></tr>
+      </tbody>
+    </table>
+    <h3>Жидкости</h3>
+    <table>
+      <thead><tr><th>Жидкость</th><th>ρ, кг/м³</th></tr></thead>
+      <tbody>
+        <tr><td>⛽ Керосин</td><td>800</td></tr>
+        <tr><td>🫒 Масло растительное</td><td>900</td></tr>
+        <tr><td>💧 Пресная вода</td><td>1000</td></tr>
+        <tr><td>🌊 Солёная вода</td><td>1030</td></tr>
+      </tbody>
+    </table>
+    <div class="bonus">
+      <b>💡 Вопрос для размышления:</b> почему в солёной воде то же тело всплывает выше, чем в пресной?
+      Проверь это в свободном режиме, меняя только жидкость.
+    </div>
+    <div class="taskactions"><button id="closeTableBtn">Закрыть</button></div>
+  </div>
+</div>
+
+<footer>Работает без интернета · Один файл · Данные никуда не отправляются</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var G = 10;
+
+  var MATERIALS = {
+    cork:  { name: "Пробка",    short: "Пробка",  rho: 240,  color: "#c9a86a", emoji: "🪵" },
+    pine:  { name: "Сосна",     short: "Сосна",   rho: 400,  color: "#b98a52", emoji: "🌲" },
+    ice:   { name: "Лёд",       short: "Лёд",     rho: 900,  color: "#bfe6f2", emoji: "🧊" },
+    alu:   { name: "Алюминий",  short: "Алюм.",   rho: 2700, color: "#aab6c2", emoji: "🔩" },
+    iron:  { name: "Железо",    short: "Железо",  rho: 7800, color: "#6d7a86", emoji: "⚙️" }
+  };
+
+  var LIQUIDS = {
+    fresh: { name: "Пресная вода", rho: 1000, color: "#7fc4e8", emoji: "💧" },
+    salt:  { name: "Солёная вода", rho: 1030, color: "#5bb4d6", emoji: "🌊" },
+    oil:   { name: "Масло",        rho: 900,  color: "#e6cf7a", emoji: "🫒" },
+    kero:  { name: "Керосин",      rho: 800,  color: "#b7c9a0", emoji: "⛽" }
+  };
+
+  var OUTCOMES = {
+    sink:    { label: "Тело утонуло",         short: "утонет" },
+    float:   { label: "Тело всплыло",         short: "всплывёт" },
+    neutral: { label: "Тело плавает внутри",  short: "будет плавать внутри" }
+  };
+
+  var TASKS = [
+    {
+      title: "Задание 1. Ледяной парадокс",
+      legend: "Заставь лёд утонуть, а потом — всплыть. Менять можно только жидкость.",
+      image: "images/task1.webp",
+      steps: ["Лёд утонул в керосине", "Лёд всплыл в воде (пресной или солёной)"]
+    },
+    {
+      title: "Задание 2. Невесомость в масле",
+      legend: "Найди пару «тело + жидкость», в которой тело висит внутри: не касается ни дна, ни поверхности.",
+      image: "images/task2.webp",
+      steps: ["Тело висит внутри жидкости: лёд + масло"]
+    },
+    {
+      title: "Задание 3. Ловушка объёма",
+      legend: "Друг утверждает: если сделать железный брусок очень маленьким, он всплывёт. Проверь при 100 см³ и при 1000 см³, затем сделай вывод.",
+      image: "images/task3.webp",
+      steps: ["Железо при 100 см³ утонуло", "Железо при 1000 см³ утонуло", "Выбран верный вывод"]
+    }
+  ];
+
+  var state = {
+    material: "cork",
+    volume: 500,
+    liquid: "fresh",
+    prediction: null,
+    running: false,
+    mode: "free",
+    experiments: 0,
+    correct: 0,
+    taskIndex: 0,
+    taskState: {},
+    conclusion: null,
+    wrongInTask3: 0,
+    task3Started: 0,
+    hintShown: false,
+    taskDone: false,
+    soundEnabled: true
+  };
+
+  try {
+    var savedSound = localStorage.getItem("arhimed_sound");
+    if (savedSound === "off") state.soundEnabled = false;
+  } catch (e) { /* ignore */ }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var canvas = $("scene");
+  var ctx = canvas.getContext("2d");
+  var rafId = null;
+
+  var W = 600, H = 420;
+  var TANK = { x: 80, y: 80, w: 430, h: 290 };
+  var SURFACE = 150;
+  var BOTTOM = TANK.y + TANK.h - 12;
+  var CENTER_X = TANK.x + TANK.w / 2;
+
+  var audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) {
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      } catch (e) { audioCtx = null; }
+    }
+    if (audioCtx && audioCtx.state === "suspended") {
+      try { audioCtx.resume(); } catch (e) { /* ignore */ }
+    }
+    return audioCtx;
+  }
+
+  function playTone(freq, duration, type, volume, startTime) {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, startTime);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(volume || 0.2, startTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  }
+
+  function playNoise(duration, volume, startTime) {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var bufferSize = Math.floor(ctx.sampleRate * duration);
+    var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+    }
+    var source = ctx.createBufferSource();
+    source.buffer = buffer;
+    var filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(800, startTime);
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(volume || 0.3, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(startTime);
+  }
+
+  function playSplash() {
+    if (!state.soundEnabled) return;
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var t = ctx.currentTime;
+    playNoise(0.35, 0.25, t);
+    playTone(180, 0.25, "sine", 0.15, t);
+    playTone(120, 0.3, "sine", 0.1, t + 0.05);
+  }
+
+  function playSuccess() {
+    if (!state.soundEnabled) return;
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var t = ctx.currentTime;
+    playTone(523.25, 0.15, "sine", 0.2, t);
+    playTone(659.25, 0.2, "sine", 0.2, t + 0.12);
+    playTone(783.99, 0.3, "sine", 0.2, t + 0.25);
+  }
+
+  function playError() {
+    if (!state.soundEnabled) return;
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var t = ctx.currentTime;
+    playTone(392, 0.18, "sawtooth", 0.15, t);
+    playTone(311.13, 0.3, "sawtooth", 0.15, t + 0.15);
+  }
+
+  function updateSoundButton() {
+    $("soundBtn").textContent = state.soundEnabled ? "🔊 Звук" : "🔇 Звук выкл";
+    $("soundBtn").classList.toggle("active", !state.soundEnabled);
+  }
+
+  function rhoBody() { return MATERIALS[state.material].rho; }
+  function rhoLiquid() { return LIQUIDS[state.liquid].rho; }
+  function volumeM3() { return state.volume * 1e-6; }
+  function gravityForce() { return rhoBody() * volumeM3() * G; }
+  function buoyancyFull() { return rhoLiquid() * volumeM3() * G; }
+  function outcomeOf() {
+    if (rhoBody() > rhoLiquid()) return "sink";
+    if (rhoBody() < rhoLiquid()) return "float";
+    return "neutral";
+  }
+  function formatForce(f) {
+    return (f < 1 ? f.toFixed(3) : f.toFixed(2)) + " Н";
+  }
+  function bodySide() {
+    return 26 * Math.pow(state.volume / 100, 1 / 3);
+  }
+
+  function buildOptions() {
+    var mh = "";
+    Object.keys(MATERIALS).forEach(function (key) {
+      mh += '<button data-material="' + key + '"><span class="emoji">' + MATERIALS[key].emoji + '</span> ' + MATERIALS[key].name + '</button>';
+    });
+    $("materialOptions").innerHTML = mh;
+
+    var lh = "";
+    Object.keys(LIQUIDS).forEach(function (key) {
+      lh += '<button data-liquid="' + key + '"><span class="emoji">' + LIQUIDS[key].emoji + '</span> ' + LIQUIDS[key].name + '</button>';
+    });
+    $("liquidOptions").innerHTML = lh;
+  }
+
+  function setFeedback(text, type) {
+    var el = $("feedback");
+    el.className = "feedback" + (type ? " " + type : "");
+    el.innerHTML = text;
+  }
+
+  function syncControls() {
+    var i, btns;
+    btns = $("materialOptions").querySelectorAll("button");
+    for (i = 0; i < btns.length; i++) {
+      var key = btns[i].getAttribute("data-material");
+      btns[i].classList.toggle("active", key === state.material);
+    }
+    btns = $("liquidOptions").querySelectorAll("button");
+    for (i = 0; i < btns.length; i++) {
+      var lkey = btns[i].getAttribute("data-liquid");
+      btns[i].classList.toggle("active", lkey === state.liquid);
+    }
+    btns = $("predictOptions").querySelectorAll("button");
+    for (i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("active", btns[i].getAttribute("data-predict") === state.prediction);
+    }
+    $("volumeValue").textContent = state.volume + " см³";
+    $("volume").value = state.volume;
+
+    var locked = state.running;
+    $("controls").disabled = locked;
+    $("modeSelect").disabled = locked;
+    $("runBtn").disabled = locked;
+    $("runBtn").classList.toggle("unavailable", !state.prediction || locked);
+
+    if (state.mode === "tasks") {
+      var lockMaterial = state.taskIndex === 0 || state.taskIndex === 2;
+      var lockVolume = state.taskIndex === 0;
+      var mbtns = $("materialOptions").querySelectorAll("button");
+      for (i = 0; i < mbtns.length; i++) {
+        mbtns[i].disabled = locked || lockMaterial;
+      }
+      $("volume").disabled = locked || lockVolume;
+    } else {
+      var mb = $("materialOptions").querySelectorAll("button");
+      for (i = 0; i < mb.length; i++) mb[i].disabled = locked;
+      $("volume").disabled = locked;
+    }
+
+    $("densLine").textContent =
+      "ρ тела = " + rhoBody() + " кг/м³  ·  ρ жидкости = " + rhoLiquid() + " кг/м³";
+    updateCounters();
+    updateProgressBar();
+  }
+
+  function updateCounters() {
+    $("counter").textContent = "Опытов: " + state.experiments + " · Верных прогнозов: " + state.correct;
+  }
+
+  function updateProgressBar() {
+    if (state.mode !== "tasks") return;
+    var s = state.taskState;
+    var total = 0, done = 0;
+    if (state.taskIndex === 0) {
+      total = 2;
+      if (s.sinkDone) done++;
+      if (s.floatDone) done++;
+    } else if (state.taskIndex === 1) {
+      total = 1;
+      if (s.neutralDone) done++;
+    } else {
+      total = 3;
+      if (s.minDone) done++;
+      if (s.maxDone) done++;
+      if (state.conclusion === "density") done++;
+    }
+    var percent = total > 0 ? (done / total) * 100 : 0;
+    $("progressFill").style.width = percent + "%";
+  }
+
+  function setForces(ft, farch, percent) {
+    $("fGravity").textContent = ft === null ? "—" : formatForce(ft);
+    $("fBuoy").textContent = farch === null ? "—" : formatForce(farch);
+    $("submerged").textContent = Math.round(percent * 100) + "%";
+  }
+
+  function resizeCanvas() {
+    var rect = canvas.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    var scale = rect.width / W;
+    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+    drawIdle();
+  }
+
+  function clearScene() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawTankBase() {
+    var gradient = ctx.createLinearGradient(0, SURFACE, 0, TANK.y + TANK.h);
+    gradient.addColorStop(0, LIQUIDS[state.liquid].color);
+    gradient.addColorStop(1, adjustColor(LIQUIDS[state.liquid].color, -20));
+    ctx.fillStyle = gradient;
+    ctx.globalAlpha = 0.6;
+    ctx.fillRect(TANK.x + 4, SURFACE, TANK.w - 8, TANK.y + TANK.h - 4 - SURFACE);
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = "#4b5563";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(TANK.x, TANK.y);
+    ctx.lineTo(TANK.x, TANK.y + TANK.h);
+    ctx.lineTo(TANK.x + TANK.w, TANK.y + TANK.h);
+    ctx.lineTo(TANK.x + TANK.w, TANK.y);
+    ctx.stroke();
+
+    ctx.strokeStyle = "#1e40af";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath();
+    ctx.moveTo(TANK.x + 4, SURFACE);
+    ctx.lineTo(TANK.x + TANK.w - 4, SURFACE);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    var depthPx = BOTTOM - SURFACE;
+    ctx.strokeStyle = "#9ca3af";
+    ctx.lineWidth = 1;
+    ctx.font = "12px system-ui, Arial";
+    ctx.fillStyle = "#6b7280";
+    for (var i = 0; i <= 4; i++) {
+      var y = SURFACE + depthPx * i / 4;
+      ctx.beginPath();
+      ctx.moveTo(TANK.x + TANK.w + 8, y);
+      ctx.lineTo(TANK.x + TANK.w + 20, y);
+      ctx.stroke();
+      ctx.fillText(i === 0 ? "0" : "+" + i, TANK.x + TANK.w + 24, y + 4);
+    }
+
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "13px system-ui, Arial";
+    ctx.fillText("поверхность", TANK.x + 8, SURFACE - 8);
+    ctx.fillText("дно", TANK.x + 8, TANK.y + TANK.h - 18);
+    ctx.fillText(LIQUIDS[state.liquid].emoji + " " + LIQUIDS[state.liquid].name, TANK.x + 8, TANK.y - 12);
+  }
+
+  function adjustColor(hex, amount) {
+    var num = parseInt(hex.slice(1), 16);
+    var r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    var g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+    var b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+    return "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function drawBody(centerY, side, fraction) {
+    var h = side, w = side;
+    var x = CENTER_X - w / 2;
+    var y = centerY - h / 2;
+    var mat = MATERIALS[state.material];
+
+    ctx.fillStyle = mat.color;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = "#374151";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+
+    ctx.fillStyle = mat.rho > 2000 ? "#ffffff" : "#1f2937";
+    ctx.font = "bold 12px system-ui, Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(mat.emoji + " " + mat.short, CENTER_X, centerY + 4);
+    ctx.textAlign = "left";
+
+    if (y < SURFACE && y + h > SURFACE) {
+      ctx.strokeStyle = "#1e40af";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, SURFACE);
+      ctx.lineTo(x + w, SURFACE);
+      ctx.stroke();
+    }
+
+    if (fraction <= 0.02) {
+      ctx.strokeStyle = "#9ca3af";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(CENTER_X, 12);
+      ctx.lineTo(CENTER_X, y);
+      ctx.stroke();
+    }
+    return { x: x, y: y, w: w, h: h };
+  }
+
+  function drawArrows(centerY, ft, farch) {
+    function arrow(fromY, toY, color, label, labelY) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(CENTER_X + 65, fromY);
+      ctx.lineTo(CENTER_X + 65, toY);
+      ctx.stroke();
+      var dir = toY > fromY ? 1 : -1;
+      ctx.beginPath();
+      ctx.moveTo(CENTER_X + 65, toY);
+      ctx.lineTo(CENTER_X + 59, toY - 8 * dir);
+      ctx.lineTo(CENTER_X + 71, toY - 8 * dir);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = "12px system-ui, Arial";
+      ctx.fillText(label, CENTER_X + 80, labelY);
+    }
+    var lenT = Math.max(12, Math.min(65, ft * 0.9));
+    var lenA = Math.max(12, Math.min(65, farch * 0.9));
+    arrow(centerY, centerY + lenT, "#dc2626", "Fт", centerY + lenT + 14);
+    arrow(centerY, centerY - lenA, "#2563eb", "Fарх", centerY - lenA - 8);
+  }
+
+  function drawAt(centerY, side, fraction) {
+    clearScene();
+    drawTankBase();
+    var geom = drawBody(centerY, side, fraction);
+    var ft = gravityForce();
+    var fa = buoyancyFull() * Math.max(0, Math.min(1, fraction));
+    drawArrows(centerY, ft, fa);
+    setForces(ft, fa, Math.max(0, Math.min(1, fraction)));
+    return geom;
+  }
+
+  function drawIdle() {
+    if (state.running) return;
+    var side = bodySide();
+    var centerY = 62;
+    clearScene();
+    drawTankBase();
+    drawBody(centerY, side, 0);
+    setForces(gravityForce(), null, 0);
+  }
+
+  function runExperiment() {
+    if (state.running) return;
+    if (!state.prediction) {
+      setFeedback('<span class="toast">Сначала предположи, что произойдёт.</span><br>В науке важно выдвинуть гипотезу до опыта.', "info");
+      syncControls();
+      return;
+    }
+
+    state.running = true;
+    syncControls();
+    setFeedback("Опыт идёт… Следи за телом и за значениями сил.", "");
+    $("taskFeedback").classList.add("hidden");
+
+    var outcome = outcomeOf();
+    var side = bodySide();
+    var half = side / 2;
+    var startX = 62;
+
+    var fullyCenter = Math.min(SURFACE + side + 25, BOTTOM - half);
+    var targetCenter;
+    var finalFraction;
+    var splashPlayed = false;
+
+    if (outcome === "sink") {
+      targetCenter = BOTTOM - half;
+      finalFraction = 1;
+    } else if (outcome === "neutral") {
+      targetCenter = (SURFACE + BOTTOM) / 2;
+      finalFraction = 1;
+    } else {
+      var submergedH = side * (rhoBody() / rhoLiquid());
+      targetCenter = SURFACE + submergedH / 2 - half;
+      finalFraction = rhoBody() / rhoLiquid();
+    }
+
+    var start = null;
+    var PHASE1 = 1000, PHASE2 = 1300;
+
+    function ease(t) { return t * t * (3 - 2 * t); }
+
+    function frame(ts) {
+      if (start === null) start = ts;
+      var elapsed = ts - start;
+      var centerY, fraction;
+
+      if (elapsed <= PHASE1) {
+        var t = ease(Math.min(1, elapsed / PHASE1));
+        centerY = startX + (fullyCenter - startX) * t;
+        fraction = Math.max(0, Math.min(1, (centerY + half - SURFACE) / side));
+        if (!splashPlayed && fraction > 0.05) {
+          splashPlayed = true;
+          playSplash();
+        }
+      } else {
+        var t2 = ease(Math.min(1, (elapsed - PHASE1) / PHASE2));
+        centerY = fullyCenter + (targetCenter - fullyCenter) * t2;
+        if (outcome === "float") {
+          var top = centerY - half;
+          fraction = Math.max(0, Math.min(1, (SURFACE - top) / side));
+        } else {
+          fraction = 1;
+        }
+      }
+
+      drawAt(centerY, side, fraction);
+
+      if (elapsed < PHASE1 + PHASE2) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        state.running = false;
+        rafId = null;
+        drawAt(targetCenter, side, finalFraction);
+        finishExperiment(outcome);
+      }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function finishExperiment(outcome) {
+    var isCorrect = state.prediction === outcome;
+    state.experiments++;
+    if (isCorrect) state.correct++;
+
+    var rb = rhoBody(), rl = rhoLiquid();
+    var relation = rb > rl ? "ρтела &gt; ρжидкости" : (rb < rl ? "ρтела &lt; ρжидкости" : "ρтела = ρжидкости");
+    var forceRelation = rb > rl ? "Fт &gt; Fарх" : (rb < rl ? "Fт &lt; Fарх (при полном погружении)" : "Fт = Fарх");
+
+    var reason;
+    if (outcome === "sink") {
+      reason = "Плотность тела больше плотности жидкости, поэтому при полном погружении Fт &gt; Fарх — тело идёт на дно.";
+    } else if (outcome === "float") {
+      reason = "Плотность тела меньше плотности жидкости. Тело всплывает и остаётся на поверхности: часть погружена, и тогда Fт = Fарх.";
+    } else {
+      reason = "Плотности равны. При полном погружении Fт = Fарх, поэтому тело остаётся в равновесии внутри жидкости.";
+    }
+
+    var html;
+    if (isCorrect) {
+      html = "<b>Верно!</b> " + OUTCOMES[outcome].label + ".<br>" +
+        relation + ", " + forceRelation + ".<br>" + reason;
+      playSuccess();
+    } else {
+      html = "<b>Неверно.</b> Ты предсказал: «" + OUTCOMES[state.prediction].short + "».<br>" +
+        "На самом деле тело " + OUTCOMES[outcome].short + ".<br>" +
+        "ρтела = " + rb + " кг/м³, ρжидкости = " + rl + " кг/м³. " + reason;
+      playError();
+    }
+
+    setFeedback(html, isCorrect ? "good" : "bad");
+    recordExperiment(outcome, isCorrect);
+    updateCounters();
+    syncControls();
+  }
+
+  function resetExperiment(keepFeedback) {
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    state.running = false;
+    state.prediction = null;
+    syncControls();
+    drawIdle();
+    if (!keepFeedback) {
+      setFeedback("Новый опыт. Измени параметры и сделай прогноз.", "");
+    }
+  }
+
+  function resetTaskState() {
+    state.taskState = { sinkDone: false, floatDone: false, neutralDone: false, minDone: false, maxDone: false };
+    state.conclusion = null;
+    state.wrongInTask3 = 0;
+    state.hintShown = false;
+    state.taskDone = false;
+    state.task3Started = Date.now();
+  }
+
+  function setTaskImage() {
+    var task = TASKS[state.taskIndex];
+    var img = $("taskImage");
+    var container = $("taskImageContainer");
+    if (!task || !task.image) {
+      container.classList.add("hidden");
+      return;
+    }
+    img.src = task.image;
+    img.alt = task.title;
+    container.classList.remove("hidden");
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    resetExperiment(true);
+    if (mode === "tasks") {
+      state.taskIndex = 0;
+      resetTaskState();
+      state.volume = 500;
+      state.material = "ice";
+      state.liquid = "kero";
+      $("taskPanel").classList.remove("hidden");
+      renderTask();
+      setTaskImage();
+      setFeedback("Прочитай задание слева. Материал и объём заданы — меняй жидкость.", "info");
+    } else {
+      $("taskPanel").classList.add("hidden");
+      setFeedback("Свободный режим. Пробуй любые сочетания и проверяй прогнозы.", "");
+    }
+    syncControls();
+    drawIdle();
+  }
+
+  function renderTask() {
+    var task = TASKS[state.taskIndex];
+    $("taskTitle").textContent = task.title;
+    $("taskLegend").textContent = task.legend;
+    $("conclusionBox").classList.toggle("hidden", state.taskIndex !== 2);
+    $("hintTaskBtn").classList.toggle("hidden", state.taskIndex !== 2);
+    $("nextTaskBtn").classList.toggle("hidden", !state.taskDone);
+    $("hintBox").classList.add("hidden");
+
+    var done = [];
+    if (state.taskIndex === 0) done = [state.taskState.sinkDone, state.taskState.floatDone];
+    if (state.taskIndex === 1) done = [state.taskState.neutralDone];
+    if (state.taskIndex === 2) done = [state.taskState.minDone, state.taskState.maxDone, state.conclusion === "density"];
+
+    var html = "";
+    for (var i = 0; i < task.steps.length; i++) {
+      html += '<li class="' + (done[i] ? "done" : "") + '">' +
+        (done[i] ? "✓ " : "○ ") + task.steps[i] + "</li>";
+    }
+    $("taskSteps").innerHTML = html;
+
+    document.querySelectorAll("[data-conclusion]").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-conclusion") === state.conclusion);
+    });
+    updateProgressBar();
+  }
+
+  function taskMessage(text, ok) {
+    var el = $("taskFeedback");
+    el.className = "feedback " + (ok ? "good" : "info");
+    el.innerHTML = text;
+    el.classList.remove("hidden");
+  }
+
+  function recordExperiment(outcome, isCorrect) {
+    if (state.mode !== "tasks") return;
+
+    var s = state.taskState;
+    var idx = state.taskIndex;
+    var mat = state.material, liq = state.liquid, vol = state.volume;
+
+    if (idx === 0 && mat === "ice") {
+      if (liq === "kero" && outcome === "sink" && isCorrect) s.sinkDone = true;
+      if ((liq === "fresh" || liq === "salt") && outcome === "float" && isCorrect) s.floatDone = true;
+    }
+    if (idx === 1 && mat === "ice" && liq === "oil" && outcome === "neutral" && isCorrect) {
+      s.neutralDone = true;
+    }
+    if (idx === 2 && mat === "iron" && outcome === "sink" && isCorrect) {
+      if (vol === 100) s.minDone = true;
+      if (vol === 1000) s.maxDone = true;
+    }
+
+    if (!isCorrect && idx === 2) {
+      state.wrongInTask3++;
+      if (state.wrongInTask3 >= 2) showHint();
+    }
+    renderTask();
+  }
+
+  function showHint() {
+    if (state.hintShown) return;
+    state.hintShown = true;
+    $("hintBox").classList.remove("hidden");
+  }
+
+  function checkTask() {
+    var s = state.taskState;
+    var ok = false, msg = "";
+
+    if (state.taskIndex === 0) {
+      ok = s.sinkDone && s.floatDone;
+      msg = ok
+        ? "Задание выполнено. Один и тот же лёд тонет в керосине и всплывает в воде: повело себя по-разному само окружение. Сравни плотности: 900 > 800 и 900 < 1000."
+        : "Пока не хватает опыта. " + (!s.sinkDone ? "Нужно увидеть, как лёд тонет в керосине, с верным прогнозом. " : "") +
+          (!s.floatDone ? "Затем смени жидкость на пресную или солёную воду и предскажи, что лёд всплывёт." : "");
+    } else if (state.taskIndex === 1) {
+      ok = s.neutralDone;
+      msg = ok
+        ? "Задание выполнено. Лёд и масло имеют одинаковую плотность (900 кг/м³): Fт = Fарх при полном погружении, тело висит внутри."
+        : "Сравни плотности в таблице и найди пару с равными значениями. Нужен верный прогноз «Будет плавать внутри».";
+    } else {
+      ok = s.minDone && s.maxDone && state.conclusion === "density";
+      msg = ok
+        ? "Задание выполнено. При 100 и при 1000 см³ железо тонуло. Уменьшение объёма уменьшает и Fт, и Fарх одинаково: их соотношение не меняется. Важна плотность, а не размер."
+        : (!s.minDone || !s.maxDone
+            ? "Нужно два опыта с железом: при 100 см³ и при 1000 см³, с верным прогнозом в каждом."
+            : "Опыты проведены. Выбери вывод, который объясняет результат.");
+    }
+
+    state.taskDone = ok;
+    taskMessage(msg, ok);
+    if (ok) playSuccess();
+    renderTask();
+  }
+
+  function nextTask() {
+    if (!state.taskDone) return;
+    if (state.taskIndex < TASKS.length - 1) {
+      state.taskIndex++;
+      resetTaskState();
+      resetExperiment(true);
+      if (state.taskIndex === 0) { state.material = "ice"; state.volume = 500; state.liquid = "kero"; }
+      if (state.taskIndex === 1) { state.material = "ice"; state.volume = 500; state.liquid = "fresh"; }
+      if (state.taskIndex === 2) { state.material = "iron"; state.volume = 100; state.liquid = "fresh"; }
+      renderTask();
+      setTaskImage();
+      syncControls();
+      drawIdle();
+      setFeedback("Прочитай новое задание и настрой опыт.", "info");
+    } else {
+      taskMessage("Все три задания пройдены. Вернись в свободный режим и проверь, что ты понял: например, почему в солёной воде тело всплывает выше.", true);
+      $("nextTaskBtn").classList.add("hidden");
+    }
+  }
+
+  $("materialOptions").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-material]");
+    if (!b || state.running || b.disabled) return;
+    state.material = b.getAttribute("data-material");
+    resetExperiment(true);
+    syncControls();
+  });
+
+  $("liquidOptions").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-liquid]");
+    if (!b || state.running) return;
+    state.liquid = b.getAttribute("data-liquid");
+    resetExperiment(true);
+    syncControls();
+  });
+
+  $("volume").addEventListener("input", function () {
+    if (state.running || $("volume").disabled) return;
+    state.volume = parseInt(this.value, 10);
+    resetExperiment(true);
+    syncControls();
+  });
+
+  $("predictOptions").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-predict]");
+    if (!b || state.running) return;
+    state.prediction = b.getAttribute("data-predict");
+    syncControls();
+    setFeedback("Прогноз выбран. Можно опускать тело.", "");
+  });
+
+  $("runBtn").addEventListener("click", runExperiment);
+  $("resetBtn").addEventListener("click", function () { resetExperiment(false); });
+
+  $("modeSelect").addEventListener("change", function () { setMode(this.value); });
+
+  $("checkTaskBtn").addEventListener("click", checkTask);
+  $("nextTaskBtn").addEventListener("click", nextTask);
+  $("hintTaskBtn").addEventListener("click", showHint);
+
+  $("restartTasksBtn").addEventListener("click", function () {
+    state.taskIndex = 0;
+    resetTaskState();
+    state.material = "ice"; state.volume = 500; state.liquid = "kero";
+    resetExperiment(true);
+    renderTask();
+    setTaskImage();
+    syncControls(); drawIdle();
+    setFeedback("Задания начаты заново.", "info");
+  });
+
+  document.querySelectorAll("[data-conclusion]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.conclusion = b.getAttribute("data-conclusion");
+      renderTask();
+    });
+  });
+
+  $("tableBtn").addEventListener("click", function () {
+    $("tableOverlay").classList.remove("hidden");
+    $("closeTableBtn").focus();
+  });
+  $("closeTableBtn").addEventListener("click", function () {
+    $("tableOverlay").classList.add("hidden");
+    $("tableBtn").focus();
+  });
+  $("tableOverlay").addEventListener("click", function (e) {
+    if (e.target === this) this.classList.add("hidden");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !$("tableOverlay").classList.contains("hidden")) {
+      $("tableOverlay").classList.add("hidden");
+    }
+  });
+
+  $("taskImage").addEventListener("error", function () {
+    $("taskImageContainer").classList.add("hidden");
+  });
+
+  $("soundBtn").addEventListener("click", function () {
+    state.soundEnabled = !state.soundEnabled;
+    try {
+      localStorage.setItem("arhimed_sound", state.soundEnabled ? "on" : "off");
+    } catch (e) { /* ignore */ }
+    updateSoundButton();
+    if (state.soundEnabled) {
+      getAudioCtx();
+      playSuccess();
+    }
+  });
+
+  window.addEventListener("resize", function () {
+    if (!state.running) resizeCanvas();
+  });
+
+  setInterval(function () {
+    if (state.mode === "tasks" && state.taskIndex === 2 && !state.taskDone && !state.hintShown) {
+      if (Date.now() - state.task3Started > 45000) showHint();
+    }
+  }, 2000);
+
+  buildOptions();
+  resetTaskState();
+  syncControls();
+  updateSoundButton();
+  resizeCanvas();
+})();
+</script>
+</body>
+</html>
